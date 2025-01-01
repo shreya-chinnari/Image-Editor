@@ -15,8 +15,8 @@ Imagio is a lightweight, web-based image editor 🎉 designed for quick and easy
 **Tech Stack** 💻
 
     
-Frontend: *HTML, CSS, JavaScript*.  
-Icons: *FontAwesome and BoxIcons for modern visuals*.  
+Frontend: **HTML, CSS, JavaScript**.  
+Icons: **FontAwesome** and **BoxIcons** for modern visuals*.  
 Canvas API: *Powers transformations and saves edits*.  
 
 
