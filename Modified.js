@@ -1,45 +1,55 @@
-const upload = document.getElementById("upload");
+// DOM elements
+const uploadInput = document.getElementById("upload");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const controls = ["brightness", "contrast", "grayscale"];
 
 let image = new Image();
-let originalImage = null;
+let originalSrc = "";
 
-upload.addEventListener("change", () => {
-	const file = upload.files[0];
+// Load Image
+uploadInput.addEventListener("change", (e) => {
+	const file = e.target.files[0];
+	if (!file) return;
+
 	const reader = new FileReader();
-
-	reader.onload = function (e) {
-		image.onload = () => {
-			canvas.width = image.width;
-			canvas.height = image.height;
-			ctx.drawImage(image, 0, 0);
-			originalImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
-		};
-		image.src = e.target.result;
+	reader.onload = function (event) {
+		originalSrc = event.target.result;
+		image.src = originalSrc;
 	};
 	reader.readAsDataURL(file);
 });
 
-function applyFilters() {
-	if (!originalImage) return;
+// Draw image on canvas when loaded
+image.onload = () => {
+	canvas.width = image.width;
+	canvas.height = image.height;
+	applyCanvasFilters();
+};
+
+// Listen for changes in all filter sliders
+controls.forEach((id) => {
+	document.getElementById(id).addEventListener("input", applyCanvasFilters);
+});
+
+// Apply filters and draw on canvas
+function applyCanvasFilters() {
+	if (!originalSrc) return;
+
 	const brightness = document.getElementById("brightness").value;
 	const contrast = document.getElementById("contrast").value;
 	const grayscale = document.getElementById("grayscale").value;
 
-	ctx.putImageData(originalImage, 0, 0);
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) grayscale(${grayscale}%)`;
 	ctx.drawImage(image, 0, 0);
+	ctx.filter = "none"; // Reset filter to avoid stacking
 }
 
-document.getElementById("brightness").oninput =
-	document.getElementById("contrast").oninput =
-	document.getElementById("grayscale").oninput =
-		applyFilters;
-
+// Download edited image
 function downloadImage() {
 	const link = document.createElement("a");
 	link.download = "edited-image.png";
-	link.href = canvas.toDataURL();
+	link.href = canvas.toDataURL("image/png");
 	link.click();
 }
